@@ -10,7 +10,7 @@ This project presents a server with three main entities: user, project and task.
 
 <table>
   <tr>
-    <td align="center" valign="center"><img src="./media/architecture.png" width="50%"></td>
+    <td align="center" valign="center"><img src="./media/architecture.png" width="60%"></td>
   </tr>
  </table>
 
