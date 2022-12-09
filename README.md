@@ -71,6 +71,7 @@ $ yarn start:prod
 ### What I learned
 
 - Nest with TypeScript
+- Config environment variables
 
 ## Stay in touch
 
