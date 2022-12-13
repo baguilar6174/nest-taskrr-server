@@ -40,7 +40,7 @@ Configure and start Database (in the root project)
 docker-compose up -d
 ```
 
-Clone `.env.template` file and rename to `.env`
+You can find environment variables in `.develop.env` file
 
 Complete environment variables
 
@@ -67,11 +67,13 @@ $ yarn start:prod
 
 - Nest JS
 - Typescript
+- Docker & Docker compose
 
 ### What I learned
 
 - Nest with TypeScript
 - Config environment variables
+- Define DB using docker compose
 
 ## Stay in touch
 

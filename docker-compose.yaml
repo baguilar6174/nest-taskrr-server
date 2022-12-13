@@ -1,0 +1,14 @@
+version: '3'
+services:
+  db:
+    image: postgres:14.3
+    restart: always
+    ports:
+      - 5433:5432
+    environment:
+      POSTGRES_DB: taskrrdb
+      POSTGRES_PASSWORD: taskrr123
+      POSTGRES_USER: utaskrr
+    container_name: taskrr
+    volumes:
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
