@@ -18,7 +18,10 @@
     "test:watch": "jest --watch",
     "test:cov": "jest --coverage",
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "orm:init": "typeorm-ts-node-esm -d ./test/jest-e2e.json",
+    "m:gen": "set NODE_ENV=develop && yarn orm:init migration:generate",
+    "m:run": "set NODE_ENV=develop && yarn orm:init migration:run"
   },
   "dependencies": {
     "@nestjs/common": "^9.0.0",
