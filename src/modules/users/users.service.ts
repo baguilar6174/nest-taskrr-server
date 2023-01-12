@@ -1,26 +1,53 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { DataSource, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { User } from './entities';
 
 @Injectable()
 export class UsersService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  constructor(
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
+    private readonly datasource: DataSource,
+  ) {}
+
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    return this.userRepository.save(createUserDto);
   }
 
-  findAll() {
-    return `This action returns all users`;
+  async findAll(): Promise<User[]> {
+    return this.userRepository.find();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: string): Promise<User> {
+    const customQuery = this.userRepository.createQueryBuilder('user');
+    const user: User = await customQuery.where({ id }).getOne();
+    if (!user) throw new NotFoundException(`user not found`);
+    return user;
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+    const user: User = await this.userRepository.preload({
+      id,
+      ...updateUserDto,
+    });
+    if (!user) throw new NotFoundException(`user not found`);
+    // Create query runner
+    const queryRunner = this.datasource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+    await queryRunner.manager.save(user);
+    await queryRunner.commitTransaction();
+    await queryRunner.release();
+    return user;
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+  async remove(id: string) {
+    const user: User = await this.findOne(id);
+    await this.userRepository.remove(user);
+    return {
+      message: `The '${user.firstName}' user has been deleted`,
+    };
   }
 }
