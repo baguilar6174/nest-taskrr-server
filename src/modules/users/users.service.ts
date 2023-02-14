@@ -3,12 +3,15 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { User } from './entities';
+import { UserToProjectDto } from './dto/user-to-project.dto';
+import { User, UsersProjects } from './entities';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
+    @InjectRepository(UsersProjects)
+    private readonly userProjectRepository: Repository<UsersProjects>,
     private readonly datasource: DataSource,
   ) {}
 
@@ -22,7 +25,11 @@ export class UsersService {
 
   async findOne(id: string): Promise<User> {
     const customQuery = this.userRepository.createQueryBuilder('user');
-    const user: User = await customQuery.where({ id }).getOne();
+    const user: User = await customQuery
+      .where({ id })
+      .leftJoinAndSelect('user.projectsInclude', 'projectsInclude')
+      .leftJoinAndSelect('projectsInclude.project', 'project')
+      .getOne();
     if (!user) throw new NotFoundException(`user not found`);
     return user;
   }
@@ -49,5 +56,9 @@ export class UsersService {
     return {
       message: `The '${user.firstName}' user has been deleted`,
     };
+  }
+
+  async addToProject(userToProjectDto: UserToProjectDto) {
+    return this.userProjectRepository.save(userToProjectDto);
   }
 }

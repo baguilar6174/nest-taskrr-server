@@ -11,6 +11,7 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities';
+import { UserToProjectDto } from './dto/user-to-project.dto';
 
 @Controller('users')
 export class UsersController {
@@ -42,5 +43,10 @@ export class UsersController {
   @Delete(':id')
   remove(@Param('id') id: string): Promise<{ message: string }> {
     return this.usersService.remove(id);
+  }
+
+  @Post('add-to-project')
+  addToProject(@Body() userToProjectDto: UserToProjectDto) {
+    return this.usersService.addToProject(userToProjectDto);
   }
 }
