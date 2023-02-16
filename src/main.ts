@@ -1,6 +1,7 @@
 import { ValidationPipe } from '@nestjs/common';
+import { ClassSerializerInterceptor } from '@nestjs/common/serializer';
 import { ConfigService } from '@nestjs/config';
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 
 import { AppModule } from './app.module';
 import { CORS } from './common/constants';
@@ -13,7 +14,11 @@ async function bootstrap(): Promise<void> {
   app.enableCors(CORS);
   app.setGlobalPrefix('api/v1');
   app.useGlobalFilters(new HttpExceptionFilter());
-  app.useGlobalInterceptors(new TimeoutInterceptor());
+  const reflector = app.get(Reflector);
+  app.useGlobalInterceptors(
+    new TimeoutInterceptor(),
+    new ClassSerializerInterceptor(reflector),
+  );
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,

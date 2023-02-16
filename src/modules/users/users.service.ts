@@ -1,6 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { DataSource, Repository } from 'typeorm';
+import * as bcrypt from 'bcrypt';
+
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { UserToProjectDto } from './dto/user-to-project.dto';
@@ -16,6 +18,10 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
+    createUserDto.password = await bcrypt.hash(
+      createUserDto.password,
+      Number(process.env.HASH_SALT),
+    );
     return this.userRepository.save(createUserDto);
   }
 
@@ -31,6 +37,21 @@ export class UsersService {
       .leftJoinAndSelect('projectsInclude.project', 'project')
       .getOne();
     if (!user) throw new NotFoundException(`user not found`);
+    return user;
+  }
+
+  async findBy({
+    key,
+    value,
+  }: {
+    key: keyof CreateUserDto;
+    value: any;
+  }): Promise<User> {
+    const customQuery = this.userRepository.createQueryBuilder('user');
+    const user: User = await customQuery
+      .addSelect('user.password')
+      .where({ [key]: value })
+      .getOne();
     return user;
   }
 
