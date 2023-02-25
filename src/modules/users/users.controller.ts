@@ -6,14 +6,19 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
+
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities';
 import { UserToProjectDto } from './dto/user-to-project.dto';
+import { PublicAccess } from '../auth/decorators/public.decorator';
+import { AuthGuard } from '../auth/guards/auth.guard';
 
 @Controller('users')
+@UseGuards(AuthGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -22,6 +27,7 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
+  @PublicAccess()
   @Get()
   findAll(): Promise<User[]> {
     return this.usersService.findAll();
