@@ -1,9 +1,10 @@
-import { Module } from '@nestjs/common';
+import { Global, Module } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UsersController } from './users.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User, UsersProjects } from './entities';
 
+@Global()
 @Module({
   controllers: [UsersController],
   providers: [UsersService],

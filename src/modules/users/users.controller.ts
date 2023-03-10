@@ -14,11 +14,14 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities';
 import { UserToProjectDto } from './dto/user-to-project.dto';
-import { PublicAccess } from '../auth/decorators/public.decorator';
+// import { PublicAccess } from '../auth/decorators/public.decorator';
 import { AuthGuard } from '../auth/guards/auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { AdminAccess } from '../auth/decorators/admin.decorator';
 
 @Controller('users')
-@UseGuards(AuthGuard)
+@UseGuards(AuthGuard, RolesGuard)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
@@ -27,12 +30,14 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
-  @PublicAccess()
+  // @PublicAccess()
+  @AdminAccess()
   @Get()
   findAll(): Promise<User[]> {
     return this.usersService.findAll();
   }
 
+  @Roles('ADMIN')
   @Get(':id')
   findOne(@Param('id') id: string): Promise<User> {
     return this.usersService.findOne(id);
